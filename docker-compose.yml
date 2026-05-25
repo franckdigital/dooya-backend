@@ -1,0 +1,111 @@
+version: '3.9'
+
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: dooya_db
+      MYSQL_USER: dooya_user
+      MYSQL_PASSWORD: dooya_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    env_file: .env
+    environment:
+      DJANGO_ENV: production
+      DB_ENGINE: django.db.backends.mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - ./media:/app/media
+      - ./staticfiles:/app/staticfiles
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 4"
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    env_file: .env
+    environment:
+      DJANGO_ENV: production
+      DB_HOST: db
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - backend
+      - redis
+    command: celery -A config.celery worker --loglevel=info --concurrency=4
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    env_file: .env
+    environment:
+      DJANGO_ENV: production
+      DB_HOST: db
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - backend
+      - redis
+    command: celery -A config.celery beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+
+  daphne:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    env_file: .env
+    environment:
+      DJANGO_ENV: production
+      DB_HOST: db
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "8001:8001"
+    depends_on:
+      - backend
+      - redis
+    command: daphne -b 0.0.0.0 -p 8001 config.asgi:application
+
+volumes:
+  mysql_data:
+  redis_data:

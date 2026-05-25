@@ -1,0 +1,68 @@
+# ─── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+*.pyo
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+MANIFEST
+
+# ─── Environnements virtuels ──────────────────────────────────────────────────
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.python-version
+
+# ─── Django ───────────────────────────────────────────────────────────────────
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+media/
+
+# ─── Variables d'environnement (secrets) ──────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ─── IDE & éditeurs ───────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ─── Tests & couverture ───────────────────────────────────────────────────────
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ─── Celery ───────────────────────────────────────────────────────────────────
+celerybeat-schedule
+celerybeat.pid
+
+# ─── Jupyter ──────────────────────────────────────────────────────────────────
+.ipynb_checkpoints
+
+# ─── Déploiement ──────────────────────────────────────────────────────────────
+*.pid
+gunicorn.pid
