@@ -28,10 +28,10 @@ cryptography==46.0.0
 daphne==4.0.0
 defusedxml==0.7.1
 diff-match-patch==20241021
-Django==5.0.14
+Django==5.2
 django-appconf==1.2.0
 django-axes==8.3.1
-django-celery-beat==2.6.0
+django-celery-beat==2.7.0
 django-celery-results==2.5.1
 django-ckeditor==6.7.3
 django-cors-headers==4.3.1
