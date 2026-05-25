@@ -57,19 +57,19 @@ class LoginSerializer(serializers.Serializer):
     def validate(self, data):
         identifier = data['username'].strip()
         password   = data['password']
+        request    = self.context.get('request')
 
-        # Resolve to a User object regardless of email vs username
         user = None
         if '@' in identifier:
             try:
                 u = User.objects.get(email__iexact=identifier)
-                user = authenticate(email=u.email, password=password)
+                user = authenticate(request=request, email=u.email, password=password)
             except User.DoesNotExist:
                 pass
         else:
             try:
                 u = User.objects.get(username__iexact=identifier)
-                user = authenticate(email=u.email, password=password)
+                user = authenticate(request=request, email=u.email, password=password)
             except User.DoesNotExist:
                 pass
 
