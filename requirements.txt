@@ -24,7 +24,7 @@ click-repl==0.3.0
 colorama==0.4.6
 constantly==23.10.4
 cron-descriptor==1.4.5
-cryptography==46.0.0
+cryptography==43.0.3
 daphne==4.0.0
 defusedxml==0.7.1
 diff-match-patch==20241021
@@ -87,7 +87,7 @@ pycparser==2.23
 PyJWT==2.12.1
 PyMuPDF==1.26.7
 PyMySQL==1.1.1
-pyOpenSSL==25.3.0
+pyOpenSSL==24.2.1
 pyotp==2.9.0
 pypng==0.20220715.0
 pytesseract==0.3.13
@@ -113,7 +113,7 @@ service-identity==24.2.0
 setuptools==82.0.1
 six==1.17.0
 social-auth-app-django==5.4.2
-social-auth-core==4.9.1
+social-auth-core==4.5.4
 sqlparse==0.5.5
 tablib==3.9.0
 tqdm==4.67.1
