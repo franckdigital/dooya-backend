@@ -191,6 +191,37 @@ class AdminAssignDeliveryView(APIView):
         return Response(DeliverySerializer(delivery).data)
 
 
+# ── Courier profile & availability ────────────────────────────────────────────
+
+@extend_schema(tags=['deliveries'])
+class CourierProfileView(APIView):
+    """Livreur — lire son propre profil (is_available, vehicle_type, …)."""
+    permission_classes = [IsAuthenticated, IsDelivery]
+
+    def get(self, request):
+        profile, _ = DeliveryProfile.objects.get_or_create(user=request.user)
+        return Response({
+            'is_available': profile.is_available,
+            'vehicle_type': profile.vehicle_type,
+            'notes': profile.notes,
+        })
+
+
+@extend_schema(tags=['deliveries'])
+class CourierAvailabilityView(APIView):
+    """Livreur — basculer sa disponibilité."""
+    permission_classes = [IsAuthenticated, IsDelivery]
+
+    def patch(self, request):
+        is_available = request.data.get('is_available')
+        if is_available is None:
+            return Response({'detail': 'is_available requis.'}, status=status.HTTP_400_BAD_REQUEST)
+        profile, _ = DeliveryProfile.objects.get_or_create(user=request.user)
+        profile.is_available = bool(is_available)
+        profile.save(update_fields=['is_available'])
+        return Response({'is_available': profile.is_available})
+
+
 # ── Dashboard livreur ─────────────────────────────────────────────────────────
 
 @extend_schema(tags=['deliveries'])

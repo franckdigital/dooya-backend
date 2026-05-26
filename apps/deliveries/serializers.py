@@ -83,8 +83,9 @@ class DeliveryPersonSerializer(serializers.Serializer):
     coverage_zones   = serializers.SerializerMethodField()
     active_deliveries = serializers.IntegerField(read_only=True)
     total_delivered   = serializers.IntegerField(read_only=True)
-    is_active   = serializers.BooleanField(read_only=True)
-    notes       = serializers.SerializerMethodField()
+    is_active         = serializers.BooleanField(read_only=True)
+    is_available      = serializers.SerializerMethodField()
+    notes             = serializers.SerializerMethodField()
 
     def get_phone(self, obj):
         return str(obj.phone or '')
@@ -98,6 +99,10 @@ class DeliveryPersonSerializer(serializers.Serializer):
         if not profile:
             return []
         return list(profile.coverage_zones.values('id', 'name'))
+
+    def get_is_available(self, obj):
+        profile = getattr(obj, 'delivery_profile', None)
+        return profile.is_available if profile else True
 
     def get_notes(self, obj):
         profile = getattr(obj, 'delivery_profile', None)

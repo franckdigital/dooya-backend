@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import CourierProfileView, CourierAvailabilityView
 
 app_name = 'deliveries'
 
@@ -13,6 +14,9 @@ urlpatterns = [
     path('delivery/<int:pk>/status/', views.DeliveryUpdateStatusView.as_view(), name='delivery-status'),
     path('delivery/<int:pk>/signature/', views.DeliverySignatureView.as_view(), name='delivery-signature'),
     path('delivery/qr-validate/', views.QRValidateView.as_view(), name='qr-validate'),
+    # Courier profile & availability
+    path('courier/profile/', CourierProfileView.as_view(), name='courier-profile'),
+    path('courier/availability/', CourierAvailabilityView.as_view(), name='courier-availability'),
     # Dashboard livreur
     path('delivery/dashboard/', views.DeliveryPersonDashboardView.as_view(), name='delivery-dashboard'),
     path('delivery/<int:pk>/detail/', views.DeliveryPersonDetailView.as_view(), name='delivery-detail'),
