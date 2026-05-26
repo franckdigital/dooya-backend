@@ -30,7 +30,7 @@ class ProductReviewSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at',
         ]
         read_only_fields = [
-            'user', 'is_verified_purchase', 'is_approved',
+            'user', 'product', 'is_verified_purchase', 'is_approved',
             'helpful_count', 'vendor_reply', 'vendor_replied_at', 'created_at',
         ]
 
