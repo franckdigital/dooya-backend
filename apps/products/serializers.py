@@ -114,6 +114,9 @@ class ProductListSerializer(serializers.ModelSerializer):
     def get_primary_image(self, obj):
         img = obj.primary_image
         if img and img.image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(img.image.url)
             return img.image.url
         return None
 
