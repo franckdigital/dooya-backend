@@ -94,7 +94,7 @@ class DeliveryPersonListView(generics.ListAPIView):
 class DeliveryUpdateStatusView(APIView):
     permission_classes = [IsAuthenticated, IsDelivery]
 
-    def patch(self, request, pk):
+    def _handle(self, request, pk):
         try:
             delivery = Delivery.objects.get(pk=pk, delivery_person=request.user)
         except Delivery.DoesNotExist:
@@ -120,7 +120,22 @@ class DeliveryUpdateStatusView(APIView):
             location=request.data.get('location', ''),
             note=request.data.get('note', ''),
         )
+        # Broadcast statut via WebSocket
+        from channels.layers import get_channel_layer
+        from asgiref.sync import async_to_sync
+        channel_layer = get_channel_layer()
+        if channel_layer and delivery.tracking_number:
+            async_to_sync(channel_layer.group_send)(
+                f'delivery_{delivery.tracking_number}',
+                {'type': 'status_update', 'status': new_status, 'location': request.data.get('location', ''), 'note': request.data.get('note', '')},
+            )
         return Response(DeliverySerializer(delivery).data)
+
+    def patch(self, request, pk):
+        return self._handle(request, pk)
+
+    def post(self, request, pk):
+        return self._handle(request, pk)
 
 
 @extend_schema(tags=['deliveries'])
@@ -353,6 +368,32 @@ class DeliveryPersonUpdateGPSView(APIView):
                 }
             )
 
+        return Response({'latitude': lat, 'longitude': lng})
+
+
+@extend_schema(tags=['deliveries'])
+class DeliveryPersonActiveListView(generics.ListAPIView):
+    """Livraisons actives du livreur connecté (assigned, picked_up, in_transit)."""
+    serializer_class = DeliverySerializer
+    permission_classes = [IsAuthenticated, IsDelivery]
+
+    def get_queryset(self):
+        return Delivery.objects.filter(
+            delivery_person=self.request.user,
+            status__in=['assigned', 'picked_up', 'in_transit'],
+        ).select_related('order', 'relay_point').order_by('estimated_delivery_date', '-created_at')
+
+
+@extend_schema(tags=['deliveries'])
+class CourierLocationUpdateView(APIView):
+    """Livreur — enregistrement de position globale (acknowledge sans persistance — utiliser /gps/ par livraison pour le WebSocket)."""
+    permission_classes = [IsAuthenticated, IsDelivery]
+
+    def post(self, request):
+        lat = request.data.get('latitude')
+        lng = request.data.get('longitude')
+        if lat is None or lng is None:
+            return Response({'detail': 'latitude et longitude requis.'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'latitude': lat, 'longitude': lng})
 
 

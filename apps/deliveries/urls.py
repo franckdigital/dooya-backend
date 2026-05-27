@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import CourierProfileView, CourierAvailabilityView
+from .views import CourierProfileView, CourierAvailabilityView, DeliveryPersonActiveListView, CourierLocationUpdateView
 
 app_name = 'deliveries'
 
@@ -14,14 +14,16 @@ urlpatterns = [
     path('delivery/<int:pk>/status/', views.DeliveryUpdateStatusView.as_view(), name='delivery-status'),
     path('delivery/<int:pk>/signature/', views.DeliverySignatureView.as_view(), name='delivery-signature'),
     path('delivery/qr-validate/', views.QRValidateView.as_view(), name='qr-validate'),
-    # Courier profile & availability
+    # Courier profile, availability & location
     path('courier/profile/', CourierProfileView.as_view(), name='courier-profile'),
     path('courier/availability/', CourierAvailabilityView.as_view(), name='courier-availability'),
+    path('courier/location/', CourierLocationUpdateView.as_view(), name='courier-location'),
     # Dashboard livreur
     path('delivery/dashboard/', views.DeliveryPersonDashboardView.as_view(), name='delivery-dashboard'),
     path('delivery/<int:pk>/detail/', views.DeliveryPersonDetailView.as_view(), name='delivery-detail'),
     path('delivery/<int:pk>/pickup/', views.DeliveryPersonPickupView.as_view(), name='delivery-pickup'),
     path('delivery/<int:pk>/gps/', views.DeliveryPersonUpdateGPSView.as_view(), name='delivery-gps'),
+    path('delivery/active/', DeliveryPersonActiveListView.as_view(), name='delivery-active'),
     path('delivery/history/', views.DeliveryPersonHistoryView.as_view(), name='delivery-history'),
 
     # Admin
