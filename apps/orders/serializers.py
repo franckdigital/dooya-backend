@@ -4,9 +4,11 @@ from .models import Order, OrderItem, OrderStatusHistory, Invoice
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    product_slug = serializers.CharField(source='product.slug', read_only=True)
+
     class Meta:
         model = OrderItem
-        fields = ['id', 'product', 'variant', 'store', 'quantity', 'unit_price', 'total_price', 'product_name', 'product_image']
+        fields = ['id', 'product', 'product_slug', 'variant', 'store', 'quantity', 'unit_price', 'total_price', 'product_name', 'product_image']
 
 
 class OrderStatusHistorySerializer(serializers.ModelSerializer):
